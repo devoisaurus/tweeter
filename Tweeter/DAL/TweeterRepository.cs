@@ -2,35 +2,49 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-<<<<<<< HEAD
 using Tweeter.Models;
-=======
->>>>>>> upstream/master
 
 namespace Tweeter.DAL
 {
     public class TweeterRepository
     {
-<<<<<<< HEAD
-        private TweeterContext Context { get; set; }
-
-=======
         public TweeterContext Context { get; set; }
->>>>>>> upstream/master
         public TweeterRepository(TweeterContext _context)
         {
             Context = _context;
         }
 
-<<<<<<< HEAD
-        public TweeterRepository()
+        public TweeterRepository() { }
+
+        public List<string> GetUsernames()
         {
-            Context = new TweeterContext();
+            return Context.TweeterUsers.Select(u => u.BaseUser.UserName).ToList();
         }
-=======
-        public TweeterRepository() {}
 
->>>>>>> upstream/master
+        public Twit UsernameExistsOfTwit(string v)
+        {
+            return Context.TweeterUsers.FirstOrDefault(u => u.BaseUser.UserName.ToLower() == v.ToLower());
+        }
 
+        public bool UsernameExists(string v)
+        {
+            // Works if mocked the UserManager
+            /*
+            if (Context.Users.Any(u => u.UserName.Contains(v)))
+            {
+                return true;
+            }
+            return false;
+            */
+
+            Twit found_twit = Context.TweeterUsers.FirstOrDefault(u => u.BaseUser.UserName.ToLower() == v.ToLower());
+            if (found_twit != null)
+            {
+                return true;
+            }
+
+            return false;
+
+        }
     }
 }
