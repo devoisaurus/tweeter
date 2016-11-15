@@ -15,7 +15,9 @@ namespace Tweeter.Tests
         private Mock<DbSet<ApplicationUser>> mock_users { get; set; }
         private Mock<TweeterContext> mock_context { get; set; }
         private TweeterRepository Repo { get; set; }
-        private List<ApplicationUser> users { get; set; }
+        private List<Twit> users { get; set; }
+        private Twit twit1;
+        private Twit twit2;
 
         [TestInitialize]
         public void Initialize()
@@ -23,6 +25,14 @@ namespace Tweeter.Tests
             mock_context = new Mock<TweeterContext>();
             mock_users = new Mock<DbSet<ApplicationUser>>();
             Repo = new TweeterRepository(mock_context.Object);
+            twit1 = new Twit
+            {
+                Username = "tweet-tweet"
+            };
+            twit2 = new Twit
+            {
+                Username = "YourMomsATwit"
+            };
 
             /*
              * 1. Install Identity into Tweeter.Tests (using statement needed)
@@ -52,6 +62,9 @@ namespace Tweeter.Tests
             /* If wejust add a Username field to the Twit model
              * mock_context.Setup(c => c.TweeterUsers).Returns(mock.user.Object); Assuming mock_users is List<Twit>
              */
+            
+
+            mock_context.Setup(c => c.TweeterUsers).Returns(mock.user.Object);
         }
 
         [TestMethod]
@@ -66,7 +79,17 @@ namespace Tweeter.Tests
         {
             TweeterRepository Repo = new TweeterRepository(mock_context.Object);
             Assert.IsNotNull(Repo);
-        }        
+        }
+
+        [TestMethod]
+        public void GetUsernames()
+        {
+            TweeterRepository Repo = new TweeterRepository(mock_context.Object);
+
+            List<Twit> allUsers = Repo.GetAllUsernames();
+
+            CollectionAssert.AreEqual(allUsers, users);
+        } 
     }
 }
 
