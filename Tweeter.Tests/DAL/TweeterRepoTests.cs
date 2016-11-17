@@ -37,22 +37,22 @@ namespace Tweeter.Tests.DAL
                     TwitId = 2,
                     BaseUser = new ApplicationUser() { UserName = "sallym"}
                 }
-        };
-
+            };
             tweets = new List<Tweet>
-             {
-                 new Tweet
-                 {
-                     TweetId = 1,
-                     Message = "What are tweets?"
-                 },
+            {
+                new Tweet
+                {
+                    TweetId = 1,
+                    Message = "Something"
+                },
+                new Tweet
+                {
+                    TweetId = 2,
+                    Message = "Test"
+                }
+            };
+            
 
-                 new Tweet
-                 {
-                     TweetId = 2,
-                     Message = "How did I get here?"
-                 }
-             };
 
             /* 
              1. Install Identity into Tweeter.Tests (using statement needed)
@@ -90,6 +90,7 @@ namespace Tweeter.Tests.DAL
 
             mock_context.Setup(c => c.Tweets).Returns(mock_tweets.Object);
             mock_tweets.Setup(u => u.Add(It.IsAny<Tweet>())).Callback((Tweet t) => tweets.Add(t));
+            mock_tweets.Setup(b => b.Remove(It.IsAny<Tweet>())).Callback((Tweet q) => tweets.Remove(q));
         }
 
         [TestMethod]
@@ -136,6 +137,56 @@ namespace Tweeter.Tests.DAL
 
             // Assert
             Assert.IsNotNull(found_twit);
+        }
+
+        [TestMethod]
+        public void CanGetTweets()
+        {
+            //Arrange
+            ConnectToDatastore();
+
+            //Act
+            List<Tweet> tweeties = Repo.GetTweets();
+
+            //Assert
+            Assert.AreEqual(2, tweeties.Count);
+
+        }
+
+        [TestMethod]
+        public void CanAddATweet()
+        {
+            //Arrange
+            ConnectToDatastore();
+            Tweet a_tweet = new Tweet { TweetId = 3, Message = "Testing" };
+
+
+            //Act
+            Repo.AddTweet(a_tweet);
+            int actual_tweet_count = Repo.GetTweets().Count;
+            int expected_tweet_count = 3;
+
+
+            //Assert
+            Assert.AreEqual(expected_tweet_count, actual_tweet_count);
+       
+        }
+
+        [TestMethod]
+        public void CanRemoveATweet()
+        {
+            //Arrange
+            ConnectToDatastore();
+            Tweet b_tweet = new Tweet { TweetId = 3, Message = "Go away" };
+
+            //Act
+            Repo.AddTweet(b_tweet);
+            Repo.RemoveTweet(b_tweet);
+            int actual_tweet_count = Repo.GetTweets().Count;
+            int expected_tweet_count = 2;
+
+            //Assert
+            Assert.AreEqual(expected_tweet_count, actual_tweet_count);
         }
     }
 }

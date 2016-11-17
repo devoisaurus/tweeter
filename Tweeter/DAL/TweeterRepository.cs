@@ -46,5 +46,22 @@ namespace Tweeter.DAL
             return false;
 
         }
+
+        public List<Tweet> GetTweets()
+        {
+            return Context.Tweets.ToList();
+        }
+
+        public void AddTweet(Tweet a_tweet)
+        {
+            Context.Tweets.Add(a_tweet);
+            Context.SaveChanges();
+        }
+
+        public void RemoveTweet(Tweet b_tweet)
+        {
+            Context.Tweets.Remove(b_tweet);
+            Context.SaveChanges();
+        }
     }
 }
