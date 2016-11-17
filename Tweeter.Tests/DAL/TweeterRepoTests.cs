@@ -15,14 +15,17 @@ namespace Tweeter.Tests.DAL
 
         private Mock<DbSet<Twit>> mock_users { get; set; }
         private Mock<TweeterContext> mock_context { get; set; }
+        private Mock<DbSet<Tweet>> mock_tweets { get; set; }
         private TweeterRepository Repo { get; set; }
         private List<Twit> users { get; set; }
+        private List<Tweet> tweets { get; set; }
 
         [TestInitialize]
         public void Initialize()
         {
             mock_context = new Mock<TweeterContext>();
             mock_users = new Mock<DbSet<Twit>>();
+            mock_tweets = new Mock<DbSet<Tweet>>();
             Repo = new TweeterRepository(mock_context.Object);
             users = new List<Twit>
             {
@@ -34,8 +37,22 @@ namespace Tweeter.Tests.DAL
                     TwitId = 2,
                     BaseUser = new ApplicationUser() { UserName = "sallym"}
                 }
+        };
 
-            };
+            tweets = new List<Tweet>
+             {
+                 new Tweet
+                 {
+                     TweetId = 1,
+                     Message = "What are tweets?"
+                 },
+
+                 new Tweet
+                 {
+                     TweetId = 2,
+                     Message = "How did I get here?"
+                 }
+             };
 
             /* 
              1. Install Identity into Tweeter.Tests (using statement needed)
@@ -63,6 +80,16 @@ namespace Tweeter.Tests.DAL
             /* IF we just add a Username field to the Twit model
              * mock_context.Setup(c => c.TweeterUsers).Returns(mock_users.Object); Assuming mock_users is List<Twit>
              */
+
+            var query_tweets = tweets.AsQueryable();
+
+            mock_tweets.As<IQueryable<Tweet>>().Setup(m => m.Provider).Returns(query_tweets.Provider);
+            mock_tweets.As<IQueryable<Tweet>>().Setup(m => m.Expression).Returns(query_tweets.Expression);
+            mock_tweets.As<IQueryable<Tweet>>().Setup(m => m.ElementType).Returns(query_tweets.ElementType);
+            mock_tweets.As<IQueryable<Tweet>>().Setup(m => m.GetEnumerator()).Returns(() => query_tweets.GetEnumerator());
+
+            mock_context.Setup(c => c.Tweets).Returns(mock_tweets.Object);
+            mock_tweets.Setup(u => u.Add(It.IsAny<Tweet>())).Callback((Tweet t) => tweets.Add(t));
         }
 
         [TestMethod]
