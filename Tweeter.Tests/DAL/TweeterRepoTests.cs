@@ -40,20 +40,9 @@ namespace Tweeter.Tests.DAL
             };
             tweets = new List<Tweet>
             {
-                new Tweet
-                {
-                    TweetId = 1,
-                    Message = "Something"
-                },
-                new Tweet
-                {
-                    TweetId = 2,
-                    Message = "Test"
-                }
+ 
             };
             
-
-
             /* 
              1. Install Identity into Tweeter.Tests (using statement needed)
              2. Create a mock context that uses 'UserManager' instead of 'TweeterContext'
@@ -158,19 +147,25 @@ namespace Tweeter.Tests.DAL
         {
             //Arrange
             ConnectToDatastore();
-            Tweet a_tweet = new Tweet { TweetId = 3, Message = "Testing" };
-
 
             //Act
+            Tweet a_tweet = new Tweet {
+                TweetId = 3,
+                Message = "Testing",
+                Author = new Twit { TwitId = 1, BaseUser = new ApplicationUser { UserName = "NotATwit" } },
+                CreatedAt = DateTime.Now
+                };
+                    
             Repo.AddTweet(a_tweet);
             int actual_tweet_count = Repo.GetTweets().Count;
-            int expected_tweet_count = 3;
+            int expected_tweet_count = 1;
 
 
             //Assert
             Assert.AreEqual(expected_tweet_count, actual_tweet_count);
        
         }
+
 
         [TestMethod]
         public void CanRemoveATweet()
